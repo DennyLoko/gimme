@@ -4,12 +4,19 @@ language: bash
 os:
 - linux
 - osx
+cache:
+  directories:
+  - "${HOME}/bin"
+  - "${HOME}/gopath/bin"
 osx_image: xcode7.3
 env:
   global:
   - GIMME_TMP="${TRAVIS_BUILD_DIR}/tmp"
   - UNAME="$(uname | tr '[:upper:]' '[:lower:]')"
   - GO_BOOTSTRAP_VERSION=1.4.3
+  - GOPATH="${HOME}/gopath"
+  - PATH="${HOME}/gopath/bin:${HOME}/bin:${PATH}"
+  - SHELLCHECK_URL="https://s3.amazonaws.com/travis-blue-public/binaries/ubuntu/14.04/x86_64/shellcheck-0.4.4.tar.bz2"
   matrix:
   - TARGET=native GO_VERSIONS="$(< .testdata/sample-binary-$UNAME) $(< .testdata/source-$UNAME)"
   - TARGET=arm GO_VERSIONS="master"
@@ -21,8 +28,20 @@ addons:
     - gcc-aarch64-linux-gnu
     - libc6-dev-arm64-cross
 before_script:
-- mkdir -p "${GIMME_TMP}"
+- mkdir -p "${GIMME_TMP}" "${HOME}/gopath"
 script:
+- if [ $UNAME = linux ] && ! shellcheck --version; then
+    curl -sSL "${SHELLCHECK_URL}" | tar -C "${HOME}/bin" -xjf -;
+    shellcheck --version;
+  fi
+- if ! command -v shfmt; then
+    eval "$(./gimme 1.6.3)" ;
+    go get -x github.com/mvdan/sh/cmd/shfmt;
+  fi
+- if [ $UNAME = linux ]; then shellcheck ./gimme; fi
+- shfmt -i 0 -w ./gimme
+- git diff --exit-code
+- git diff --cached --exit-code
 - ./gimme -h
 - ./gimme -V
 - ./runtests "${TARGET}" "${GO_BOOTSTRAP_VERSION}" ${GO_VERSIONS}
