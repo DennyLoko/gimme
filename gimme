@@ -259,7 +259,7 @@ _env() {
 	else
 		echo 'unset GOROOT;'
 	fi
-	echo "export PATH=\"${1}/bini\":${PATH}"
+	echo "export PATH=\"${1}/bin\":\${PATH};"
 	if [[ -z "${GIMME_SILENT_ENV}" ]]; then
 		echo 'go version >&2;'
 	fi
