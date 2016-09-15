@@ -35,8 +35,7 @@ script:
     shellcheck --version;
   fi
 - if ! command -v shfmt; then
-    eval "$(./gimme 1.6.3)" ;
-    go get -x github.com/mvdan/sh/cmd/shfmt;
+    (eval "$(./gimme 1.6.3)" && go get -x github.com/mvdan/sh/cmd/shfmt);
   fi
 - if [ $UNAME = linux ]; then shellcheck ./gimme; fi
 - shfmt -i 0 -w ./gimme
