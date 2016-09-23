@@ -17,6 +17,7 @@ env:
   - GOPATH="${HOME}/gopath"
   - PATH="${HOME}/gopath/bin:${HOME}/bin:${PATH}"
   - SHELLCHECK_URL="https://s3.amazonaws.com/travis-blue-public/binaries/ubuntu/14.04/x86_64/shellcheck-0.4.4.tar.bz2"
+  - SHFMT_URL="https://github.com/mvdan/sh/releases/download/v0.1.0/shfmt_v0.1.0_linux_amd64"
   matrix:
   - TARGET=native GO_VERSIONS="$(< .testdata/sample-binary-$UNAME) $(< .testdata/source-$UNAME)"
   - TARGET=arm GO_VERSIONS="master"
@@ -34,8 +35,9 @@ script:
     curl -sSL "${SHELLCHECK_URL}" | tar -C "${HOME}/bin" -xjf -;
     shellcheck --version;
   fi
-- if ! command -v shfmt; then
-    bash -c 'eval $(./gimme 1.6.3) && go get -x github.com/mvdan/sh/cmd/shfmt; rm -rf ~/.gimme';
+- if ! command -v shfmt ; then
+    curl -sSL "${SHFMT_URL}" -o "${HOME}/bin/shfmt" ;
+    chmod +x "${HOME}/bin/shfmt" ;
   fi
 - if [ $UNAME = linux ]; then shellcheck ./gimme; fi
 - shfmt -i 0 -w ./gimme
