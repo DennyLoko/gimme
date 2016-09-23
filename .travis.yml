@@ -39,10 +39,7 @@ script:
     curl -sSL "${SHFMT_URL}" -o "${HOME}/bin/shfmt" ;
     chmod +x "${HOME}/bin/shfmt" ;
   fi
-- if [ $UNAME = linux ]; then
-    git grep -l '^#!/usr/bin/env bash' | xargs shellcheck;
-  fi
-- git grep -l '^#!/usr/bin/env bash' | xargs shfmt -i 0 -w
+- if [ $UNAME = linux ]; then make lint ; fi
 - git diff --exit-code
 - git diff --cached --exit-code
 - ./gimme -h
