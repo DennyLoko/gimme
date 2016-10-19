@@ -1,13 +1,13 @@
-sudo: required
-dist: trusty
 language: bash
+sudo: false
+dist: trusty
+group: beta
 os:
 - linux
 - osx
 cache:
   directories:
   - "${HOME}/bin"
-  - "${HOME}/gopath/bin"
 osx_image: xcode7.3
 env:
   global:
@@ -15,7 +15,7 @@ env:
   - UNAME="$(uname | tr '[:upper:]' '[:lower:]')"
   - GO_BOOTSTRAP_VERSION=1.4.3
   - GOPATH="${HOME}/gopath"
-  - PATH="${HOME}/gopath/bin:${HOME}/bin:${PATH}"
+  - PATH="${HOME}/bin:${PATH}"
   - SHELLCHECK_URL="https://s3.amazonaws.com/travis-blue-public/binaries/ubuntu/14.04/x86_64/shellcheck-0.4.4.tar.bz2"
   - SHFMT_URL="https://github.com/mvdan/sh/releases/download/v0.1.0/shfmt_v0.1.0_linux_amd64"
   matrix:
@@ -29,7 +29,7 @@ addons:
     - gcc-aarch64-linux-gnu
     - libc6-dev-arm64-cross
 before_script:
-- mkdir -p "${GIMME_TMP}" "${HOME}/gopath"
+- mkdir -p "${GIMME_TMP}"
 script:
 - if [ $UNAME = linux ] && ! shellcheck --version; then
     curl -sSL "${SHELLCHECK_URL}" | tar -C "${HOME}/bin" -xjf -;
@@ -39,7 +39,7 @@ script:
     curl -sSL "${SHFMT_URL}" -o "${HOME}/bin/shfmt" ;
     chmod +x "${HOME}/bin/shfmt" ;
   fi
-- if [ $UNAME = linux ]; then make lint ; fi
+- if [ $UNAME = linux ]; then make lint; fi
 - git diff --exit-code
 - git diff --cached --exit-code
 - ./gimme -h
